@@ -7,7 +7,11 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"shared/ent/users"
+	"shared/ent/accessgroup"
+	"shared/ent/business"
+	"shared/ent/user"
+	"shared/ent/usersonaccessgroups"
+	"shared/ent/userstatus"
 	"sync"
 
 	"entgo.io/ent"
@@ -73,7 +77,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			users.Table: users.ValidColumn,
+			accessgroup.Table:         accessgroup.ValidColumn,
+			business.Table:            business.ValidColumn,
+			user.Table:                user.ValidColumn,
+			userstatus.Table:          userstatus.ValidColumn,
+			usersonaccessgroups.Table: usersonaccessgroups.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -12,8 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Users is the client for interacting with the Users builders.
-	Users *UsersClient
+	// AccessGroup is the client for interacting with the AccessGroup builders.
+	AccessGroup *AccessGroupClient
+	// Business is the client for interacting with the Business builders.
+	Business *BusinessClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
+	// UserStatus is the client for interacting with the UserStatus builders.
+	UserStatus *UserStatusClient
+	// UsersOnAccessGroups is the client for interacting with the UsersOnAccessGroups builders.
+	UsersOnAccessGroups *UsersOnAccessGroupsClient
 
 	// lazily loaded.
 	client     *Client
@@ -145,7 +153,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Users = NewUsersClient(tx.config)
+	tx.AccessGroup = NewAccessGroupClient(tx.config)
+	tx.Business = NewBusinessClient(tx.config)
+	tx.User = NewUserClient(tx.config)
+	tx.UserStatus = NewUserStatusClient(tx.config)
+	tx.UsersOnAccessGroups = NewUsersOnAccessGroupsClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -155,7 +167,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Users.QueryXXX(), the query will be executed
+// applies a query, for example: AccessGroup.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

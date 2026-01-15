@@ -5,7 +5,6 @@ package enttest
 import (
 	"context"
 	"shared/ent"
-
 	// required by schema hooks.
 	_ "shared/ent/runtime"
 

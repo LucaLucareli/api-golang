@@ -8,23 +8,147 @@ import (
 )
 
 var (
+	// AccessGroupsColumns holds the columns for the "access_groups" table.
+	AccessGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Size: 100},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deactivated_at", Type: field.TypeTime, Nullable: true},
+	}
+	// AccessGroupsTable holds the schema information for the "access_groups" table.
+	AccessGroupsTable = &schema.Table{
+		Name:       "access_groups",
+		Columns:    AccessGroupsColumns,
+		PrimaryKey: []*schema.Column{AccessGroupsColumns[0]},
+	}
+	// BusinessesColumns holds the columns for the "businesses" table.
+	BusinessesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 60},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deactivated_at", Type: field.TypeTime, Nullable: true},
+	}
+	// BusinessesTable holds the schema information for the "businesses" table.
+	BusinessesTable = &schema.Table{
+		Name:       "businesses",
+		Columns:    BusinessesColumns,
+		PrimaryKey: []*schema.Column{BusinessesColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "email", Type: field.TypeString, Unique: true},
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 256},
+		{Name: "password", Type: field.TypeString, Size: 30},
+		{Name: "is_manager", Type: field.TypeBool, Default: false},
+		{Name: "photo_url", Type: field.TypeString, Nullable: true, Size: 500},
+		{Name: "document", Type: field.TypeString, Unique: true, Size: 50},
+		{Name: "email", Type: field.TypeString, Nullable: true, Size: 256},
+		{Name: "deactivated_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "business_users", Type: field.TypeInt, Nullable: true},
+		{Name: "manager_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "user_business", Type: field.TypeInt, Nullable: true},
+		{Name: "user_status_id", Type: field.TypeInt, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_businesses_users",
+				Columns:    []*schema.Column{UsersColumns[10]},
+				RefColumns: []*schema.Column{BusinessesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_users_subordinates",
+				Columns:    []*schema.Column{UsersColumns[11]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_businesses_business",
+				Columns:    []*schema.Column{UsersColumns[12]},
+				RefColumns: []*schema.Column{BusinessesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_user_status_users",
+				Columns:    []*schema.Column{UsersColumns[13]},
+				RefColumns: []*schema.Column{UserStatusColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// UserStatusColumns holds the columns for the "user_status" table.
+	UserStatusColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "external_id", Type: field.TypeString, Unique: true, Size: 5},
+		{Name: "name", Type: field.TypeString, Unique: true, Size: 60},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// UserStatusTable holds the schema information for the "user_status" table.
+	UserStatusTable = &schema.Table{
+		Name:       "user_status",
+		Columns:    UserStatusColumns,
+		PrimaryKey: []*schema.Column{UserStatusColumns[0]},
+	}
+	// UsersOnAccessGroupsColumns holds the columns for the "users_on_access_groups" table.
+	UsersOnAccessGroupsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "access_group_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// UsersOnAccessGroupsTable holds the schema information for the "users_on_access_groups" table.
+	UsersOnAccessGroupsTable = &schema.Table{
+		Name:       "users_on_access_groups",
+		Columns:    UsersOnAccessGroupsColumns,
+		PrimaryKey: []*schema.Column{UsersOnAccessGroupsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_on_access_groups_access_groups_users",
+				Columns:    []*schema.Column{UsersOnAccessGroupsColumns[3]},
+				RefColumns: []*schema.Column{AccessGroupsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "users_on_access_groups_users_access_groups",
+				Columns:    []*schema.Column{UsersOnAccessGroupsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "usersonaccessgroups_user_id_access_group_id",
+				Unique:  true,
+				Columns: []*schema.Column{UsersOnAccessGroupsColumns[4], UsersOnAccessGroupsColumns[3]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AccessGroupsTable,
+		BusinessesTable,
 		UsersTable,
+		UserStatusTable,
+		UsersOnAccessGroupsTable,
 	}
 )
 
 func init() {
+	UsersTable.ForeignKeys[0].RefTable = BusinessesTable
+	UsersTable.ForeignKeys[1].RefTable = UsersTable
+	UsersTable.ForeignKeys[2].RefTable = BusinessesTable
+	UsersTable.ForeignKeys[3].RefTable = UserStatusTable
+	UsersOnAccessGroupsTable.ForeignKeys[0].RefTable = AccessGroupsTable
+	UsersOnAccessGroupsTable.ForeignKeys[1].RefTable = UsersTable
 }

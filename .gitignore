@@ -1,0 +1,5 @@
+.env
+go.sum
+apps/auth-api/go.sum
+apps/employee-api/go.sum
+shared/go.sum

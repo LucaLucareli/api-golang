@@ -5,9 +5,13 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"shared"
 
 	"shared/container"
+	"shared/interceptors"
 	"shared/logger"
+	"shared/validation"
+	exceptionfactory "shared/validation/exception-factory"
 
 	"employee-api/modules"
 
@@ -38,13 +42,30 @@ func main() {
 		log.Fatal().Err(err).Msg("Falha ao criar container")
 	}
 
+	appState := shared.NewAppState(dbURL)
+
 	e := echo.New()
 
 	e.HideBanner = true
 	e.Logger.SetOutput(io.Discard)
 
+	e.Use(interceptors.TransformInterceptor)
+
+	e.Validator = validation.NewValidator()
+
+	e.Use(validation.ValidationMiddleware)
+
+	e.HTTPErrorHandler = func(err error, c echo.Context) {
+		if validationErr := exceptionfactory.CustomExceptionFactory(err); validationErr != nil {
+			_ = c.JSON(validationErr.Code, validationErr.Message)
+			return
+		}
+
+		e.DefaultHTTPErrorHandler(err, c)
+	}
+
 	app := modules.NewAppModule()
-	app.RegisterAllRoutes(e)
+	app.RegisterAllRoutes(e, appState)
 
 	address := fmt.Sprintf(":%s", port)
 	log.Info().Msgf("Application is running on: http://localhost:%s/api", port)

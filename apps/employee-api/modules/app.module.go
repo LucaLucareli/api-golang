@@ -2,6 +2,7 @@ package modules
 
 import (
 	"employee-api/modules/users"
+	"shared"
 
 	"github.com/labstack/echo/v4"
 	"github.com/quantumsheep/plouf"
@@ -18,7 +19,7 @@ func NewAppModule() *AppModule {
 	}
 }
 
-func (m *AppModule) RegisterAllRoutes(e *echo.Echo) {
+func (m *AppModule) RegisterAllRoutes(e *echo.Echo, state *shared.AppState) {
 	api := e.Group("/api")
 
 	m.UserModule.RegisterRoutes(api)

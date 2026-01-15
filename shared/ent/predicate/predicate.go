@@ -6,5 +6,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Users is the predicate function for users builders.
-type Users func(*sql.Selector)
+// AccessGroup is the predicate function for accessgroup builders.
+type AccessGroup func(*sql.Selector)
+
+// Business is the predicate function for business builders.
+type Business func(*sql.Selector)
+
+// User is the predicate function for user builders.
+type User func(*sql.Selector)
+
+// UserStatus is the predicate function for userstatus builders.
+type UserStatus func(*sql.Selector)
+
+// UsersOnAccessGroups is the predicate function for usersonaccessgroups builders.
+type UsersOnAccessGroups func(*sql.Selector)

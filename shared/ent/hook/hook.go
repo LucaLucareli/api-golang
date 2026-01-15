@@ -8,16 +8,64 @@ import (
 	"shared/ent"
 )
 
-// The UsersFunc type is an adapter to allow the use of ordinary
-// function as Users mutator.
-type UsersFunc func(context.Context, *ent.UsersMutation) (ent.Value, error)
+// The AccessGroupFunc type is an adapter to allow the use of ordinary
+// function as AccessGroup mutator.
+type AccessGroupFunc func(context.Context, *ent.AccessGroupMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f UsersFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.UsersMutation); ok {
+func (f AccessGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AccessGroupMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UsersMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AccessGroupMutation", m)
+}
+
+// The BusinessFunc type is an adapter to allow the use of ordinary
+// function as Business mutator.
+type BusinessFunc func(context.Context, *ent.BusinessMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f BusinessFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.BusinessMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BusinessMutation", m)
+}
+
+// The UserFunc type is an adapter to allow the use of ordinary
+// function as User mutator.
+type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+}
+
+// The UserStatusFunc type is an adapter to allow the use of ordinary
+// function as UserStatus mutator.
+type UserStatusFunc func(context.Context, *ent.UserStatusMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserStatusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UserStatusMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserStatusMutation", m)
+}
+
+// The UsersOnAccessGroupsFunc type is an adapter to allow the use of ordinary
+// function as UsersOnAccessGroups mutator.
+type UsersOnAccessGroupsFunc func(context.Context, *ent.UsersOnAccessGroupsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UsersOnAccessGroupsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.UsersOnAccessGroupsMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UsersOnAccessGroupsMutation", m)
 }
 
 // Condition is a hook condition function.
