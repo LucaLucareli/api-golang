@@ -22,5 +22,5 @@ func NewAppModule() *AppModule {
 func (m *AppModule) RegisterAllRoutes(e *echo.Echo, state *shared.AppState) {
 	api := e.Group("/api")
 
-	m.UserModule.RegisterRoutes(api)
+	m.UserModule.RegisterRoutes(api, state)
 }

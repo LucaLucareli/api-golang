@@ -51,6 +51,8 @@ func main() {
 
 	e.Use(interceptors.TransformInterceptor)
 
+	e.Use(interceptors.RequestLogger)
+
 	e.Validator = validation.NewValidator()
 
 	e.Use(validation.ValidationMiddleware)
