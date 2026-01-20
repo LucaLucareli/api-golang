@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"shared/ent"
 	"shared/ent/user"
@@ -85,4 +86,45 @@ func (r *usersRepository) FindByID(
 		Document:       u.Document,
 		AccessGroupIds: accessGroupIds,
 	}, nil
+}
+
+func (r *usersRepository) FindManyUsersToReport(ctx context.Context) (<-chan dto.FindManyUsersToReportStreamItem, error) {
+	out := make(chan dto.FindManyUsersToReportStreamItem)
+
+	go func() {
+		defer close(out)
+		const pageSize = 100
+		var lastCreatedAt time.Time
+
+		for {
+			users, err := r.client.User.
+				Query().
+				Where(user.CreatedAtGT(lastCreatedAt)).
+				Order(ent.Asc(user.FieldID)).
+				Limit(pageSize).
+				Select(user.FieldID, user.FieldName, user.FieldDocument, user.FieldCreatedAt).
+				All(ctx)
+			if err != nil {
+				out <- dto.FindManyUsersToReportStreamItem{Err: err}
+				return
+			}
+
+			if len(users) == 0 {
+				break
+			}
+
+			for _, u := range users {
+				out <- dto.FindManyUsersToReportStreamItem{
+					User: dto.FindManyUsersToReportOutputDTO{
+						ID:       u.ID,
+						Name:     u.Name,
+						Document: u.Document,
+					},
+				}
+				lastCreatedAt = u.CreatedAt
+			}
+		}
+	}()
+
+	return out, nil
 }

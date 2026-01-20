@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"shared"
 
-	"shared/container"
+	"shared/helpers"
 	"shared/interceptors"
 	"shared/logger"
 	"shared/validation"
@@ -20,29 +19,29 @@ import (
 )
 
 const (
-	AppName     = "AuthApi"
-	DefaultDB   = "postgresql://postgres:pass@localhost:5432/auth_db?sslmode=disable"
-	DefaultPort = "3001"
-	DefaultEnv  = "DEV"
+	AppName          = "AuthApi"
+	DefaultDB        = "postgresql://postgres:pass@localhost:5432/auth_db?sslmode=disable"
+	DefaultPort      = "3001"
+	DefaultRedisPort = "1234"
+	DefaultEnv       = "DEV"
 )
 
 func init() {
-	env := getEnv("LOG", DefaultEnv)
+	env := helpers.GetEnv("LOG", DefaultEnv)
 	logger.Init(AppName, logger.ColorRed, env)
 }
 
 func main() {
-	dbURL := getEnv("DATABASE_URL", DefaultDB)
-	port := getEnv("AUTH_API_PORT", DefaultPort)
+	dbURL := helpers.GetEnv("DATABASE_URL", DefaultDB)
+
+	redisPort := helpers.GetEnv("REDIS_CACHE_PORT", DefaultRedisPort)
+	redisURL := fmt.Sprintf("localhost:%s", redisPort)
+
+	port := helpers.GetEnv("AUTH_API_PORT", DefaultPort)
 
 	log.Info().Msgf("Starting %s application...", AppName)
 
-	_, _, err := container.Build(dbURL)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Falha ao criar container")
-	}
-
-	appState := shared.NewAppState(dbURL)
+	appState := shared.NewAppState(dbURL, redisURL)
 
 	e := echo.New()
 
@@ -77,11 +76,4 @@ func main() {
 	if err := e.Start(address); err != nil && err != http.ErrServerClosed {
 		log.Fatal().Err(err).Msg("Erro fatal no servidor")
 	}
-}
-
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
 }

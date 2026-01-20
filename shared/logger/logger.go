@@ -24,6 +24,7 @@ const (
 	ColorWhite  = "\x1b[97m"
 	ColorBold   = "\x1b[1m"
 	ColorPurple = "\x1b[35m"
+	ColorBlue   = "\x1b[34m"
 )
 
 var levelEmojis = map[string]string{

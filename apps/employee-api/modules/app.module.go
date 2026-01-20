@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"employee-api/modules/report"
 	"employee-api/modules/users"
 	"shared"
 
@@ -10,7 +11,8 @@ import (
 
 type AppModule struct {
 	plouf.Module
-	UserModule *users.UserModule
+	UserModule   *users.UserModule
+	ReportModule *report.ReportModule
 }
 
 func NewAppModule() *AppModule {
@@ -23,4 +25,5 @@ func (m *AppModule) RegisterAllRoutes(e *echo.Echo, state *shared.AppState) {
 	api := e.Group("/api")
 
 	m.UserModule.RegisterRoutes(api, state)
+	m.ReportModule.RegisterRoutes(api, state)
 }

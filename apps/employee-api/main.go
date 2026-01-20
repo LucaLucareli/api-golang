@@ -7,7 +7,7 @@ import (
 	"os"
 	"shared"
 
-	"shared/container"
+	"shared/helpers"
 	"shared/interceptors"
 	"shared/logger"
 	"shared/validation"
@@ -20,29 +20,29 @@ import (
 )
 
 const (
-	AppName     = "EmployeeApi"
-	DefaultDB   = "postgresql://postgres:pass@localhost:5432/employee_db?sslmode=disable"
-	DefaultPort = "3003"
-	DefaultEnv  = "DEV"
+	AppName          = "EmployeeApi"
+	DefaultDB        = "postgresql://postgres:pass@localhost:5432/employee_db?sslmode=disable"
+	DefaultPort      = "3003"
+	DefaultRedisPort = "1234"
+	DefaultEnv       = "DEV"
 )
 
 func init() {
-	env := getEnv("LOG", DefaultEnv)
+	env := helpers.GetEnv("LOG", DefaultEnv)
 	logger.Init(AppName, logger.ColorPurple, env)
 }
 
 func main() {
-	dbURL := getEnv("DATABASE_URL", DefaultDB)
-	port := getEnv("EMPLOYEE_API_PORT", DefaultPort)
+	dbURL := helpers.GetEnv("DATABASE_URL", DefaultDB)
+
+	redisPort := helpers.GetEnv("REDIS_CACHE_PORT", DefaultRedisPort)
+	redisURL := fmt.Sprintf("localhost:%s", redisPort)
+
+	port := helpers.GetEnv("EMPLOYEE_API_PORT", DefaultPort)
 
 	log.Info().Msgf("Starting %s application...", AppName)
 
-	_, _, err := container.Build(dbURL)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Falha ao criar container")
-	}
-
-	appState := shared.NewAppState(dbURL)
+	appState := shared.NewAppState(dbURL, redisURL)
 
 	e := echo.New()
 
